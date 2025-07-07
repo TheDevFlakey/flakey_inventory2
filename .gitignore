@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+
+# Vite build output
+dist/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor/IDE configs
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Optional: lock files
+# Uncomment if you're not using them to lock dependencies
+# package-lock.json
+# yarn.lock

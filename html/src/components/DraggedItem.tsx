@@ -1,0 +1,61 @@
+/** @format */
+
+import React from "react";
+import { ItemDefinitions } from "../utils/itemDefinitions";
+
+interface DraggedItemProps {
+  item: {
+    label: string;
+    width: number;
+    height: number;
+    quantity?: number;
+  };
+  position: { x: number; y: number };
+  cellSize: number;
+}
+
+const DraggedItem: React.FC<DraggedItemProps> = ({
+  item,
+  position,
+  cellSize,
+}) => {
+  const image = ItemDefinitions[item.label]?.image || "";
+  const weight = ItemDefinitions[item.label]?.weight || 0;
+
+  return (
+    <div
+      className="pointer-events-none fixed z-50 bg-white/20 text-white text-xs flex flex-col justify-between items-center overflow-hidden"
+      style={{
+        left: position.x,
+        top: position.y,
+        width: item.width * cellSize,
+        height: item.height * cellSize,
+        transform: "translate(-20%, -20%)",
+      }}
+    >
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center w-full h-full p-1">
+          <div className="w-[70%] h-[70%] flex items-center justify-center">
+            <img
+              src={image}
+              alt={item.label}
+              className="max-w-full max-h-full object-contain pointer-events-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {item.quantity && item.quantity > 1 && (
+        <span className="absolute top-1 right-1 text-[10px] text-white bg-black/40 px-1 rounded">
+          x{item.quantity}
+        </span>
+      )}
+
+      <span className="absolute bottom-1 left-1 text-[10px] text-white bg-black/40 px-1 rounded">
+        {weight}kg
+      </span>
+    </div>
+  );
+};
+
+export default DraggedItem;
