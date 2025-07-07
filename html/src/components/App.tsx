@@ -112,7 +112,50 @@ const App: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const onItemClick = (item: Item) => {
+  const onItemClick = (item: Item, e?: React.MouseEvent) => {
+    console.log("Item clicked:", e);
+    if (e?.ctrlKey) {
+      const targetInventory = item.inventoryId === 1 ? 2 : 1;
+
+      // Try to find a valid position in the other inventory
+      for (let y = 0; y <= GRID_HEIGHT - item.height; y++) {
+        for (let x = 0; x <= GRID_WIDTH - item.width; x++) {
+          if (
+            canPlaceItemAt(
+              x,
+              y,
+              item,
+              items,
+              targetInventory,
+              GRID_WIDTH,
+              GRID_HEIGHT
+            )
+          ) {
+            fetchNui("moveItem", {
+              label: item.label,
+              fromX: item.gridX,
+              fromY: item.gridY,
+              fromInventory: item.inventoryId,
+              toX: x,
+              toY: y,
+              toInventory: targetInventory,
+              width: item.width,
+              height: item.height,
+              originalWidth: item.originalWidth ?? item.width,
+              originalHeight: item.originalHeight ?? item.height,
+            });
+
+            setSelectedItem(null);
+            return;
+          }
+        }
+      }
+
+      // Optionally show feedback if no space
+      console.warn("No valid space found in opposite inventory.");
+      return;
+    }
+
     if (selectedItem && selectedItem.id === item.id) {
       setSelectedItem(null);
     } else {

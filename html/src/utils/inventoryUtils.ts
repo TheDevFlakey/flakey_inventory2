@@ -9,7 +9,6 @@ export const canPlaceItemAt = (
 ): boolean => {
   if (!item) return false;
 
-  // Prevent overflow outside grid bounds
   if (x + item.width > gridWidth || y + item.height > gridHeight) return false;
 
   for (let dx = 0; dx < item.width; dx++) {
@@ -19,23 +18,25 @@ export const canPlaceItemAt = (
 
       const conflictingItem = items.find((other) => {
         if (other.inventoryId !== inventoryId) return false;
-        const isSelfOrSameStack =
-          other.id === item.id ||
-          (other.label === item.label &&
-            other.width === item.width &&
-            other.height === item.height &&
-            other.gridX === item.gridX &&
-            other.gridY === item.gridY &&
-            other.inventoryId === inventoryId);
-
-        if (isSelfOrSameStack) return false;
 
         const withinX =
           cellX >= other.gridX && cellX < other.gridX + other.width;
         const withinY =
           cellY >= other.gridY && cellY < other.gridY + other.height;
+        if (!withinX || !withinY) return false;
 
-        return withinX && withinY;
+        const isSelf = other.id === item.id;
+        if (isSelf) return false;
+
+        const isStackTarget =
+          other.label === item.label &&
+          other.inventoryId === inventoryId &&
+          other.width === (item.originalWidth ?? item.width) &&
+          other.height === (item.originalHeight ?? item.height);
+
+        if (isStackTarget) return false;
+
+        return true;
       });
 
       if (conflictingItem) return false;

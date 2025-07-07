@@ -19,7 +19,7 @@ interface InventoryItemProps {
   item: Item;
   selectedItem: Item | null;
   isDragging: boolean;
-  onItemClick: (item: Item) => void;
+  onItemClick: (item: Item, e: React.MouseEvent) => void;
   onRightClick: (item: Item) => void;
   cellSize: number;
 }
@@ -46,7 +46,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
       onClick={(e) => {
         if (isDragging) return;
         e.stopPropagation();
-        onItemClick(item);
+        onItemClick(item, e);
       }}
       onMouseDown={(e) => {
         if (e.button === 2) {
