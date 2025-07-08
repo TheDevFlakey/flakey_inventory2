@@ -41,7 +41,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   return (
     <div
       className={`absolute bg-white/20 text-white flex flex-col justify-between overflow-hidden items-center text-xs ${
-        isSelected ? "ring-1 ring-white select-none" : ""
+        isSelected ? "border-[1.5px] border-blue-400 select-none" : ""
       }`}
       onClick={(e) => {
         if (isDragging) return;

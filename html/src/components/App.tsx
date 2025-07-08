@@ -7,6 +7,7 @@ import InventoryGrid from "./InventoryGrid";
 import DraggedItem from "./DraggedItem";
 import { canPlaceItemAt } from "../utils/inventoryUtils"; // Assuming this function is exported from InventoryGrid
 import SplitModal from "./SplitModal"; // Assuming you have a SplitModal component
+import InventoryWeight from "./InventoryWeight"; // Assuming you have an InventoryWeight component
 
 interface Item {
   id: number;
@@ -278,7 +279,11 @@ const App: React.FC = () => {
         )}
         <div className="min-h-screen bg-black/50 text-white flex items-center p-8 space-x-20 justify-center select-none">
           <div>
-            <h2 className="text-sm mb-2">Player Inventory</h2>
+            <InventoryWeight
+              items={getDisplayItems(1)}
+              label="Player Inventory"
+              maxInventoryWeight={100} // Adjust this value as needed
+            />
             <InventoryGrid
               inventoryId={1}
               items={getDisplayItems(1)}
@@ -292,7 +297,11 @@ const App: React.FC = () => {
             />
           </div>
           <div>
-            <h2 className="text-sm mb-2">Ground Inventory</h2>
+            <InventoryWeight
+              items={getDisplayItems(2)}
+              label="Ground Inventory"
+              maxInventoryWeight={200} // Adjust this value as needed
+            />
             <InventoryGrid
               inventoryId={2}
               items={getDisplayItems(2)}

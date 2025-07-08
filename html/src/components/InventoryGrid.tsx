@@ -80,7 +80,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
           <div
             key={`ghost-${dx}-${dy}`}
             className={`absolute pointer-events-none ${
-              valid ? "bg-green-400/20" : "bg-red-400/20"
+              valid ? "bg-blue-400/20" : "bg-red-400/20"
             }`}
             style={{
               width: CELL_SIZE,
