@@ -93,7 +93,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         {ItemDefinitions[item.label]?.weight * (item.quantity || 1)}kg
       </span>
       <div
-        className={`fixed pointer-events-none transition-opacity duration-200 ${
+        className={`fixed pointer-events-none transition-opacity duration-200 z-10 ${
           showTooltip ? "opacity-100" : "opacity-0"
         }`}
         style={{ top: tooltipPos.y, left: tooltipPos.x }}

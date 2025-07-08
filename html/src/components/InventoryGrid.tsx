@@ -44,22 +44,6 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
     y: number;
   } | null>(null);
 
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
-  const occupied = useMemo(() => {
-    const occ = new Set<string>();
-    for (const item of items) {
-      if (item.inventoryId !== inventoryId) continue;
-      for (let dx = 0; dx < item.width; dx++) {
-        for (let dy = 0; dy < item.height; dy++) {
-          occ.add(`${item.gridX + dx},${item.gridY + dy}`);
-        }
-      }
-    }
-    return occ;
-  }, [items, inventoryId]);
-
   const ghostPreview = useMemo(() => {
     if (!selectedItem || !hoveredCell) return null;
     const { x, y } = hoveredCell;

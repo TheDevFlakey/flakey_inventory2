@@ -1,3 +1,4 @@
+// NEEDS FIXING LOTS OF BUGS
 export const canPlaceItemAt = (
   x: number,
   y: number,
