@@ -183,15 +183,20 @@ const App: React.FC = () => {
 
     if (!valid) return; // Prevent invalid drop
 
-    const matchingItemInCell = items.find(
-      (i) =>
+    const matchingItemInCell = items.find((i) => {
+      const sameDimensions =
+        (i.width === selectedItem.width && i.height === selectedItem.height) ||
+        (i.width === selectedItem.originalWidth &&
+          i.height === selectedItem.originalHeight);
+
+      return (
         i.gridX === x &&
         i.gridY === y &&
         i.inventoryId === inventoryId &&
         i.label === selectedItem.label &&
-        i.width === selectedItem.width &&
-        i.height === selectedItem.height
-    );
+        sameDimensions
+      );
+    });
 
     if (matchingItemInCell) {
       fetchNui("stackItem", {

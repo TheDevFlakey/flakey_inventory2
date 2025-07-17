@@ -1,4 +1,3 @@
-// NEEDS FIXING LOTS OF BUGS
 export const canPlaceItemAt = (
   x: number,
   y: number,
@@ -24,20 +23,33 @@ export const canPlaceItemAt = (
           cellX >= other.gridX && cellX < other.gridX + other.width;
         const withinY =
           cellY >= other.gridY && cellY < other.gridY + other.height;
+
         if (!withinX || !withinY) return false;
 
-        const isSelf = other.id === item.id;
-        if (isSelf) return false;
-
-        const isStackTarget =
+        // Exclude self or part of same stack
+        const isSameItemOrStack =
           other.label === item.label &&
+          other.gridX === item.gridX &&
+          other.gridY === item.gridY &&
+          other.inventoryId === item.inventoryId &&
+          ((other.width === item.width && other.height === item.height) ||
+            (other.width === item.originalWidth &&
+              other.height === item.originalHeight));
+
+        if (isSameItemOrStack) return false;
+
+        // Allow stacking if it exactly matches the placement
+        const isValidStackTarget =
+          other.label === item.label &&
+          other.gridX === x &&
+          other.gridY === y &&
           other.inventoryId === inventoryId &&
-          other.width === (item.originalWidth ?? item.width) &&
-          other.height === (item.originalHeight ?? item.height);
+          other.width === item.width &&
+          other.height === item.height;
 
-        if (isStackTarget) return false;
+        if (isValidStackTarget) return false;
 
-        return true;
+        return true; // Conflict
       });
 
       if (conflictingItem) return false;

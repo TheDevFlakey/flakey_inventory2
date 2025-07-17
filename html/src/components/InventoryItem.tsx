@@ -90,7 +90,10 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         </span>
       )}
       <span className="absolute bottom-1 left-1 text-[10px] text-white bg-black/40 px-1 rounded">
-        {ItemDefinitions[item.label]?.weight * (item.quantity || 1)}kg
+        {(
+          (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
+        ).toFixed(2)}
+        kg
       </span>
       <div
         className={`fixed pointer-events-none transition-opacity duration-200 z-10 ${
@@ -108,7 +111,10 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
             </div>
           )}
           <div className="text-white/50 text-[10px]">
-            {ItemDefinitions[item.label]?.weight * (item.quantity || 1)}kg
+            {(
+              (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
+            ).toFixed(2)}
+            kg
           </div>
         </div>
       </div>
