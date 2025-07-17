@@ -27,5 +27,9 @@ RegisterNUICallback("stackItem", function(data, cb)
     cb({ success = true })
 end)
 
+RegisterNUICallback("splitItem", function(data, cb)
+    TriggerServerEvent("fl_inventory:splitItem", data)
+    cb({ success = true })
+end)
 
 RegisterKeyMapping("open:inv", "Open Inventory", "keyboard", "F2")

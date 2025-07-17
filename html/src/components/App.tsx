@@ -83,6 +83,14 @@ const App: React.FC = () => {
   const [splitItem, setSplitItem] = useState<Item | null>(null);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [splittingItem, setSplittingItem] = useState<{
+    label: string;
+    oldX: number;
+    oldY: number;
+    oldWidth: number;
+    oldHeight: number;
+    amount: number;
+  } | null>(null);
 
   useNuiEvent("setInventoryVisible", (data) => {
     setVisible(data.visible);
@@ -183,6 +191,34 @@ const App: React.FC = () => {
 
     if (!valid) return; // Prevent invalid drop
 
+    if (splittingItem) {
+      console.log(
+        "Splitting item:",
+        JSON.stringify(splittingItem),
+        " to new position:",
+        x,
+        y
+      );
+      // Handle splitting logic here
+      fetchNui("splitItem", {
+        label: splittingItem.label,
+        fromX: splittingItem.oldX,
+        fromY: splittingItem.oldY,
+        fromInventory: selectedItem.inventoryId,
+        toX: x,
+        toY: y,
+        toInventory: inventoryId,
+        width: splittingItem.oldWidth,
+        height: splittingItem.oldHeight,
+        amount: splittingItem.amount,
+        originalWidth: selectedItem.originalWidth,
+        originalHeight: selectedItem.originalHeight,
+      });
+      setSelectedItem(null);
+      setSplittingItem(null);
+      return;
+    }
+
     const matchingItemInCell = items.find((i) => {
       const sameDimensions =
         (i.width === selectedItem.width && i.height === selectedItem.height) ||
@@ -274,10 +310,15 @@ const App: React.FC = () => {
             item={splitItem}
             onCancel={() => setShowSplitModal(false)}
             onConfirm={(amount: number) => {
-              fetchNui("splitItem", {
-                id: splitItem.id,
+              setSplittingItem({
+                label: splitItem.label,
+                oldX: splitItem.gridX,
+                oldY: splitItem.gridY,
+                oldWidth: splitItem.width,
+                oldHeight: splitItem.height,
                 amount,
               });
+              setSelectedItem(splitItem);
               setShowSplitModal(false);
             }}
           />
