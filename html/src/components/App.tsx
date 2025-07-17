@@ -26,7 +26,7 @@ const GRID_WIDTH = 6;
 const GRID_HEIGHT = 6;
 
 const App: React.FC = () => {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [items, setItems] = useState<Item[]>([
     {
       id: 1,
@@ -192,14 +192,7 @@ const App: React.FC = () => {
     if (!valid) return; // Prevent invalid drop
 
     if (splittingItem) {
-      console.log(
-        "Splitting item:",
-        JSON.stringify(splittingItem),
-        " to new position:",
-        x,
-        y
-      );
-      // Handle splitting logic here
+      // Handle splitting logic here (TODO: Implement split logic)
       fetchNui("splitItem", {
         label: splittingItem.label,
         fromX: splittingItem.oldX,
