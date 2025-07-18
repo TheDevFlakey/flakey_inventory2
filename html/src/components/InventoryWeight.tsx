@@ -6,7 +6,7 @@ const InventoryWeight: React.FC<{
   maxInventoryWeight: number;
 }> = ({ items, label, maxInventoryWeight }) => {
   const totalWeight = items.reduce((total, item) => {
-    const definition = ItemDefinitions[item.label];
+    const definition = ItemDefinitions[item.item_id];
     if (definition && definition.weight) {
       return total + definition.weight * (item.quantity || 1);
     }

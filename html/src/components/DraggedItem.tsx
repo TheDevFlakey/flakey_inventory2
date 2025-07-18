@@ -19,8 +19,8 @@ const DraggedItem: React.FC<DraggedItemProps> = ({
   position,
   cellSize,
 }) => {
-  const image = ItemDefinitions[item.label]?.image || "";
-  const weight = ItemDefinitions[item.label]?.weight || 0;
+  const image = ItemDefinitions[item.item_id]?.image || "";
+  const weight = ItemDefinitions[item.item_id]?.weight || 0;
 
   return (
     <div

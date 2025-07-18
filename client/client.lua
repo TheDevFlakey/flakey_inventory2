@@ -39,4 +39,14 @@ RegisterNUICallback("moveItemSplit", function(data, cb)
     cb({ success = true })
 end)
 
+RegisterNUICallback("useItem", function(data, cb)
+    SetNuiFocus(false, false)
+    TriggerServerEvent("fl_inventory:useItem", data)
+    cb({ success = true })
+end)
+
+RegisterNetEvent("fl_inventory:itemUsedNotification", function(label, item_id)
+    SendReactMessage("showItemUsedNotification", { label = label, item_id = item_id })
+end)
+
 RegisterKeyMapping("open:inv", "Open Inventory", "keyboard", "F2")

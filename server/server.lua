@@ -205,84 +205,105 @@ AddEventHandler("fl_inventory:stackItem", function(data)
     end
 end)
 
-CreateThread(function()
-    while true do
-        local decayDelay = 600000 * 3 -- 30 mins
-        Wait(decayDelay)
+-- TODO LATER!!!!!!!
 
-        for owner, inventory in pairs(Flakey_Inventories) do
-            local updated = false
+-- CreateThread(function()
+--     while true do
+--         local decayDelay = 600000 * 3 -- 30 mins
+--         Wait(decayDelay)
 
-            -- Iterate backwards to safely remove items while looping
-            for i = #inventory, 1, -1 do
-                local item = inventory[i]
-                local def = ItemDefinitions[item.label]
-                local decayRate = def and def.decayRate or 0
+--         for owner, inventory in pairs(Flakey_Inventories) do
+--             local updated = false
 
-                if item.durability and decayRate > 0 then
-                    local newDurability = item.durability - decayRate
+--             -- Iterate backwards to safely remove items while looping
+--             for i = #inventory, 1, -1 do
+--                 local item = inventory[i]
+--                 local def = ItemDefinitions[item.label]
+--                 local decayRate = def and def.decayRate or 0
 
-                    if newDurability <= 0 then
-                        -- Delete from DB
-                        MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", {
-                            ['@id'] = item.id
-                        })
+--                 if item.durability and decayRate > 0 then
+--                     local newDurability = item.durability - decayRate
 
-                        -- Remove from in-memory table
-                        table.remove(inventory, i)
+--                     if newDurability <= 0 then
+--                         -- Delete from DB
+--                         MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", {
+--                             ['@id'] = item.id
+--                         })
 
-                        updated = true
-                    else
-                        item.durability = newDurability
+--                         -- Remove from in-memory table
+--                         table.remove(inventory, i)
 
-                        -- Update in DB
-                        MySQL.update.await([[
-                            UPDATE flakey_inventory
-                            SET durability = @durability
-                            WHERE id = @id
-                        ]], {
-                            ['@durability'] = newDurability,
-                            ['@id'] = item.id
-                        })
+--                         updated = true
+--                     else
+--                         item.durability = newDurability
 
-                        updated = true
-                    end
-                end
-            end
+--                         -- Update in DB
+--                         MySQL.update.await([[
+--                             UPDATE flakey_inventory
+--                             SET durability = @durability
+--                             WHERE id = @id
+--                         ]], {
+--                             ['@durability'] = newDurability,
+--                             ['@id'] = item.id
+--                         })
 
-            -- Sync updated inventory to client
-            local src = exports["flakey_core"]:getSourceFromCID(owner)
-            if updated and src then
-                TriggerClientEvent("fl_inventory:sendItems", src, inventory)
-            end
-        end
-    end
-end)
+--                         updated = true
+--                     end
+--                 end
+--             end
 
-RegisterServerEvent("fl_inventory:decayItem", function(data)
+--             -- Sync updated inventory to client
+--             local src = exports["flakey_core"]:getSourceFromCID(owner)
+--             if updated and src then
+--                 TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+--             end
+--         end
+--     end
+-- end)
+
+-- RegisterServerEvent("fl_inventory:decayItem", function(data)
+--     local src = source
+--     local owner = exports["flakey_core"]:activeCharacter()[src]
+--     local inventory = Flakey_Inventories[owner] or {}
+
+--     for _, item in pairs(inventory) do
+--         if item.label == data.label and item.id == data.id then
+--             local def = ItemDefinitions[item.label]
+--             if def and def.decayRate then
+--                 item.durability = math.max(item.durability - def.decayRate, 0)
+
+--                 -- Update DB durability
+--                 MySQL.update.await([[
+--                     UPDATE flakey_inventory
+--                     SET durability = @durability
+--                     WHERE id = @id
+--                 ]], {
+--                     ['@durability'] = item.durability,
+--                     ['@id'] = item.id
+--                 })
+
+--                 TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+--                 break
+--             end
+--         end
+--     end
+-- end)
+
+RegisterServerEvent("fl_inventory:useItem")
+AddEventHandler("fl_inventory:useItem", function(data)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
     local inventory = Flakey_Inventories[owner] or {}
-
     for _, item in pairs(inventory) do
         if item.label == data.label and item.id == data.id then
-            local def = ItemDefinitions[item.label]
-            if def and def.decayRate then
-                item.durability = math.max(item.durability - def.decayRate, 0)
-
-                -- Update DB durability
-                MySQL.update.await([[
-                    UPDATE flakey_inventory
-                    SET durability = @durability
-                    WHERE id = @id
-                ]], {
-                    ['@durability'] = item.durability,
+            if data.removeOnUse then
+                MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", { 
                     ['@id'] = item.id
                 })
-
-                TriggerClientEvent("fl_inventory:sendItems", src, inventory)
-                break
             end
+            TriggerClientEvent(data.useEvent, src)
+            TriggerClientEvent("fl_inventory:itemUsedNotification", src, item.label, item.item_id)
+            break
         end
     end
 end)

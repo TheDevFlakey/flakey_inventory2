@@ -52,7 +52,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
       onMouseDown={(e) => {
         if (e.button === 2) {
           e.preventDefault();
-          if (!isDragging && item.quantity && item.quantity > 1) {
+          if (!isDragging) {
             onRightClick(item, { x: e.clientX, y: e.clientY });
           }
         }
@@ -78,7 +78,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         <div className="flex flex-col items-center justify-center w-full h-full p-1">
           <div className="w-[70%] h-[70%] flex items-center justify-center">
             <img
-              src={ItemDefinitions[item.label]?.image || ""}
+              src={ItemDefinitions[item.item_id]?.image || ""}
               alt={item.label}
               className="max-w-full max-h-full object-contain pointer-events-none"
             />
@@ -105,7 +105,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
       ></div>
       <span className="absolute bottom-1 left-2 text-[10px] text-white bg-black/40 px-1 rounded-sm">
         {(
-          (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
+          (ItemDefinitions[item.item_id]?.weight ?? 0) * (item.quantity || 1)
         ).toFixed(2)}
         kg
       </span>
@@ -119,14 +119,15 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
           <div className="font-bold">
             {item.quantity || 1}x {item.label}
           </div>
-          {ItemDefinitions[item.label]?.description && (
+          {ItemDefinitions[item.item_id]?.description && (
             <div className="text-white/70">
-              {ItemDefinitions[item.label]?.description}
+              {ItemDefinitions[item.item_id]?.description}
             </div>
           )}
           <div className="text-white/70">
             {(
-              (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
+              (ItemDefinitions[item.item_id]?.weight ?? 0) *
+              (item.quantity || 1)
             ).toFixed(2)}
             kg
           </div>

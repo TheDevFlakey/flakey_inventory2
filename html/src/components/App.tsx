@@ -8,6 +8,8 @@ import DraggedItem from "./DraggedItem";
 import { canPlaceItemAt } from "../utils/inventoryUtils"; // Assuming this function is exported from InventoryGrid
 import SplitModal from "./SplitModal"; // Assuming you have a SplitModal component
 import InventoryWeight from "./InventoryWeight"; // Assuming you have an InventoryWeight component
+import { ItemDefinitions } from "../utils/itemDefinitions";
+import InventoryNotifications from "./InventoryNotifications"; // Assuming you have an InventoryNotifications component
 
 interface Item {
   id: number;
@@ -21,6 +23,7 @@ interface Item {
   originalWidth?: number;
   originalHeight?: number;
   durability: number;
+  item_id: number;
 }
 
 const GRID_WIDTH = 6;
@@ -272,84 +275,106 @@ const App: React.FC = () => {
     return () => window.removeEventListener("mousemove", updateMouse);
   }, []);
 
+  const useItem = (item: Item) => {
+    fetchNui("useItem", {
+      label: item.label,
+      gridX: item.gridX,
+      gridY: item.gridY,
+      inventoryId: item.inventoryId,
+      width: item.width,
+      height: item.height,
+      owner: item.owner,
+      id: item.id,
+      useEvent: ItemDefinitions[item.item_id]?.useEvent || "",
+      removeOnUse: ItemDefinitions[item.item_id]?.removeOnUse || false,
+    });
+    setSelectedItem(null);
+    setShowSplitModal(false);
+    setVisible(false);
+  };
+
   return (
-    visible && (
-      <>
-        {selectedItem && (
-          <DraggedItem
-            item={selectedItem}
-            position={mousePosition} // You’ll need to track this with `onMouseMove`
-            cellSize={92}
-          />
-        )}
-        {showSplitModal && splitItem && (
-          <SplitModal
-            item={splitItem}
-            position={splitModalPosition}
-            onCancel={() => setShowSplitModal(false)}
-            onConfirm={(amount: number) => {
-              setSplittingItem({
-                label: splitItem.label,
-                oldX: splitItem.gridX,
-                oldY: splitItem.gridY,
-                oldWidth: splitItem.width,
-                oldHeight: splitItem.height,
-                amount,
-              });
-              // setSelectedItem as splitItem but change x and y to -1
-              const splitItemCopy = {
-                ...splitItem,
-                gridX: -1,
-                gridY: -1,
-                quantity: amount,
-              };
-              setSelectedItem(splitItemCopy);
-              setShowSplitModal(false);
-            }}
-          />
-        )}
-        <div className="min-h-screen bg-black/90 text-white flex items-center p-8 space-x-20 justify-center select-none">
-          <div>
-            <InventoryWeight
-              items={getDisplayItems(1)}
-              label="Player Inventory"
-              maxInventoryWeight={100} // Adjust this value as needed
+    <>
+      <InventoryNotifications />
+      {visible && (
+        <>
+          {selectedItem && (
+            <DraggedItem
+              item={selectedItem}
+              position={mousePosition} // You’ll need to track this with `onMouseMove`
+              cellSize={92}
             />
-            <InventoryGrid
-              inventoryId={1}
-              items={getDisplayItems(1)}
-              selectedItem={selectedItem}
-              onCellClick={onCellClick}
-              onItemClick={onItemClick}
-              onRightClick={(item, position) => {
-                setSplitItem(item);
-                setShowSplitModal(true);
-                setSplitModalPosition({ x: position.x, y: position.y });
+          )}
+          {showSplitModal && splitItem && (
+            <SplitModal
+              item={splitItem}
+              position={splitModalPosition}
+              onCancel={() => setShowSplitModal(false)}
+              onUse={() => useItem(splitItem)}
+              onConfirm={(amount: number) => {
+                setSplittingItem({
+                  label: splitItem.label,
+                  oldX: splitItem.gridX,
+                  oldY: splitItem.gridY,
+                  oldWidth: splitItem.width,
+                  oldHeight: splitItem.height,
+                  amount,
+                });
+                // setSelectedItem as splitItem but change x and y to -1
+                const splitItemCopy = {
+                  ...splitItem,
+                  gridX: -1,
+                  gridY: -1,
+                  quantity: amount,
+                };
+                setSelectedItem(splitItemCopy);
+                setShowSplitModal(false);
               }}
             />
+          )}
+          <div className="min-h-screen bg-black/90 text-white flex items-center p-8 space-x-20 justify-center select-none">
+            <div>
+              <InventoryWeight
+                items={getDisplayItems(1)}
+                label="Player Inventory"
+                maxInventoryWeight={100} // Adjust this value as needed
+              />
+              <InventoryGrid
+                inventoryId={1}
+                items={getDisplayItems(1)}
+                selectedItem={selectedItem}
+                onCellClick={onCellClick}
+                onItemClick={onItemClick}
+                onRightClick={(item, position) => {
+                  setSplitItem(item);
+                  setShowSplitModal(true);
+                  setSplitModalPosition({ x: position.x, y: position.y });
+                }}
+              />
+            </div>
+            <div>
+              <InventoryWeight
+                items={getDisplayItems(2)}
+                label="Ground Inventory"
+                maxInventoryWeight={200} // Adjust this value as needed
+              />
+              <InventoryGrid
+                inventoryId={2}
+                items={getDisplayItems(2)}
+                selectedItem={selectedItem}
+                onCellClick={onCellClick}
+                onItemClick={onItemClick}
+                onRightClick={(item, position) => {
+                  setSplitItem(item);
+                  setShowSplitModal(true);
+                  setSplitModalPosition({ x: position.x, y: position.y });
+                }}
+              />
+            </div>
           </div>
-          <div>
-            <InventoryWeight
-              items={getDisplayItems(2)}
-              label="Ground Inventory"
-              maxInventoryWeight={200} // Adjust this value as needed
-            />
-            <InventoryGrid
-              inventoryId={2}
-              items={getDisplayItems(2)}
-              selectedItem={selectedItem}
-              onCellClick={onCellClick}
-              onItemClick={onItemClick}
-              onRightClick={(item, position) => {
-                setSplitItem(item);
-                setShowSplitModal(true);
-                setSplitModalPosition({ x: position.x, y: position.y });
-              }}
-            />
-          </div>
-        </div>
-      </>
-    )
+        </>
+      )}
+    </>
   );
 };
 

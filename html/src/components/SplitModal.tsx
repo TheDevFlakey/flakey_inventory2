@@ -5,13 +5,16 @@ const SplitModal = ({
   onConfirm,
   onCancel,
   position,
+  onUse,
 }: {
   item: any;
   onConfirm: (amount: number) => void;
   onCancel: () => void;
   position: { x: number; y: number };
+  onUse: () => void;
 }) => {
   const [amount, setAmount] = useState(1);
+  console.log(item.inventoryId);
 
   return (
     <div className="fixed inset-0 z-50">
@@ -70,6 +73,14 @@ const SplitModal = ({
           >
             Confirm
           </button>
+          {item.inventoryId === 1 && (
+            <button
+              onClick={onUse}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-sm py-1 rounded-sm transition"
+            >
+              Use Item
+            </button>
+          )}
           <button
             onClick={onCancel}
             className="flex-1 bg-red-600 hover:bg-red-500 text-white text-sm py-1 rounded-sm transition"
