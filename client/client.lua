@@ -1,6 +1,6 @@
 RegisterCommand("open:inv", function()
     SetNuiFocus(true, true)
-    TriggerServerEvent("fl_inventory:requestItems")
+    TriggerServerEvent("fl_inventory:requestItems", 123456)
 end)
 
 RegisterNetEvent("fl_inventory:sendItems", function(items)

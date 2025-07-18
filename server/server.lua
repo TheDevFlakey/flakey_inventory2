@@ -1,7 +1,7 @@
 local Flakey_Inventories = {}
 
 RegisterServerEvent("fl_inventory:requestItems")
-AddEventHandler("fl_inventory:requestItems", function()
+AddEventHandler("fl_inventory:requestItems", function(secondaryId)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
 
@@ -168,4 +168,86 @@ AddEventHandler("fl_inventory:stackItem", function(data)
 
     -- Refresh client with updated inventory
     TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+end)
+
+CreateThread(function()
+    while true do
+        local decayDelay = 600000 * 3 -- 30 mins
+        Wait(decayDelay)
+
+        for owner, inventory in pairs(Flakey_Inventories) do
+            local updated = false
+
+            -- Iterate backwards to safely remove items while looping
+            for i = #inventory, 1, -1 do
+                local item = inventory[i]
+                local def = ItemDefinitions[item.label]
+                local decayRate = def and def.decayRate or 0
+
+                if item.durability and decayRate > 0 then
+                    local newDurability = item.durability - decayRate
+
+                    if newDurability <= 0 then
+                        -- Delete from DB
+                        MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", {
+                            ['@id'] = item.id
+                        })
+
+                        -- Remove from in-memory table
+                        table.remove(inventory, i)
+
+                        updated = true
+                    else
+                        item.durability = newDurability
+
+                        -- Update in DB
+                        MySQL.update.await([[
+                            UPDATE flakey_inventory
+                            SET durability = @durability
+                            WHERE id = @id
+                        ]], {
+                            ['@durability'] = newDurability,
+                            ['@id'] = item.id
+                        })
+
+                        updated = true
+                    end
+                end
+            end
+
+            -- Sync updated inventory to client
+            local src = exports["flakey_core"]:getSourceFromCID(owner)
+            if updated and src then
+                TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+            end
+        end
+    end
+end)
+
+RegisterServerEvent("fl_inventory:decayItem", function(data)
+    local src = source
+    local owner = exports["flakey_core"]:activeCharacter()[src]
+    local inventory = Flakey_Inventories[owner] or {}
+
+    for _, item in pairs(inventory) do
+        if item.label == data.label and item.id == data.id then
+            local def = ItemDefinitions[item.label]
+            if def and def.decayRate then
+                item.durability = math.max(item.durability - def.decayRate, 0)
+
+                -- Update DB durability
+                MySQL.update.await([[
+                    UPDATE flakey_inventory
+                    SET durability = @durability
+                    WHERE id = @id
+                ]], {
+                    ['@durability'] = item.durability,
+                    ['@id'] = item.id
+                })
+
+                TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+                break
+            end
+        end
+    end
 end)
