@@ -80,6 +80,7 @@ const App: React.FC = () => {
     },
   ]);
   const [showSplitModal, setShowSplitModal] = useState(false);
+  const [splitModalPosition, setSplitModalPosition] = useState({ x: 0, y: 0 });
   const [splitItem, setSplitItem] = useState<Item | null>(null);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -205,6 +206,8 @@ const App: React.FC = () => {
 
       if (matchingItems.length < splittingItem.amount) {
         console.warn("Not enough items to split.");
+        setSelectedItem(null);
+        setSplittingItem(null);
         return;
       }
 
@@ -319,6 +322,7 @@ const App: React.FC = () => {
         {showSplitModal && splitItem && (
           <SplitModal
             item={splitItem}
+            position={splitModalPosition}
             onCancel={() => setShowSplitModal(false)}
             onConfirm={(amount: number) => {
               setSplittingItem({
@@ -329,7 +333,14 @@ const App: React.FC = () => {
                 oldHeight: splitItem.height,
                 amount,
               });
-              setSelectedItem(splitItem);
+              // setSelectedItem as splitItem but change x and y to -1
+              const splitItemCopy = {
+                ...splitItem,
+                gridX: -1,
+                gridY: -1,
+                quantity: amount,
+              };
+              setSelectedItem(splitItemCopy);
               setShowSplitModal(false);
             }}
           />
@@ -347,9 +358,10 @@ const App: React.FC = () => {
               selectedItem={selectedItem}
               onCellClick={onCellClick}
               onItemClick={onItemClick}
-              onRightClick={(item) => {
+              onRightClick={(item, position) => {
                 setSplitItem(item);
                 setShowSplitModal(true);
+                setSplitModalPosition({ x: position.x, y: position.y });
               }}
             />
           </div>
@@ -365,6 +377,11 @@ const App: React.FC = () => {
               selectedItem={selectedItem}
               onCellClick={onCellClick}
               onItemClick={onItemClick}
+              onRightClick={(item, position) => {
+                setSplitItem(item);
+                setShowSplitModal(true);
+                setSplitModalPosition({ x: position.x, y: position.y });
+              }}
             />
           </div>
         </div>

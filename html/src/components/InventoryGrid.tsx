@@ -22,7 +22,7 @@ interface InventoryGridProps {
   selectedItem: Item | null;
   onCellClick: (x: number, y: number, inventoryId: number) => void;
   onItemClick: (item: Item) => void;
-  onRightClick: (item: Item) => void; // 🔹 new prop
+  onRightClick: (item: Item, position: { x: number; y: number }) => void;
   gridWidth?: number;
   gridHeight?: number;
 }
