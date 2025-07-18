@@ -27,7 +27,7 @@ interface InventoryGridProps {
   gridHeight?: number;
 }
 
-const CELL_SIZE = 82;
+const CELL_SIZE = 92;
 
 const InventoryGrid: React.FC<InventoryGridProps> = ({
   inventoryId,

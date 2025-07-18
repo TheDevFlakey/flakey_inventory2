@@ -51,6 +51,20 @@ const DraggedItem: React.FC<DraggedItemProps> = ({
         </span>
       )}
 
+      {/* Durability bar */}
+      <div
+        className={`absolute bottom-0 left-0 h-full w-[4px] bg-black/40 ${
+          item.durability > 60
+            ? "bg-blue-400"
+            : item.durability > 30
+            ? "bg-yellow-400"
+            : "bg-red-400"
+        }`}
+        style={{
+          height: `${(item.durability / 100) * 100}%`,
+        }}
+      ></div>
+
       <span className="absolute bottom-1 left-1 text-[10px] text-white bg-black/40 px-1 rounded">
         {weight}kg
       </span>

@@ -20,6 +20,7 @@ interface Item {
   owner: string;
   originalWidth?: number;
   originalHeight?: number;
+  durability: number;
 }
 
 const GRID_WIDTH = 6;
@@ -27,58 +28,7 @@ const GRID_HEIGHT = 6;
 
 const App: React.FC = () => {
   const [visible, setVisible] = useState(false);
-  const [items, setItems] = useState<Item[]>([
-    {
-      id: 1,
-      label: "Chair",
-      gridX: 0,
-      gridY: 2,
-      inventoryId: 1,
-      width: 2,
-      height: 2,
-      owner: "Player",
-    },
-    {
-      id: 2,
-      label: "Chair",
-      gridX: 0,
-      gridY: 5,
-      inventoryId: 1,
-      width: 2,
-      height: 1,
-      owner: "Player",
-    },
-    {
-      id: 3,
-      label: "Chair",
-      gridX: 0,
-      gridY: 0,
-      inventoryId: 1,
-      width: 1,
-      height: 1,
-      owner: "Player",
-    },
-    {
-      id: 4,
-      label: "Chair",
-      gridX: 3,
-      gridY: 1,
-      inventoryId: 1,
-      width: 1,
-      height: 2,
-      owner: "Player",
-    },
-    {
-      id: 5,
-      label: "Chair",
-      gridX: 3,
-      gridY: 1,
-      inventoryId: 1,
-      width: 1,
-      height: 2,
-      owner: "Player",
-    },
-  ]);
+  const [items, setItems] = useState<Item[]>([]);
   const [showSplitModal, setShowSplitModal] = useState(false);
   const [splitModalPosition, setSplitModalPosition] = useState({ x: 0, y: 0 });
   const [splitItem, setSplitItem] = useState<Item | null>(null);
@@ -316,7 +266,7 @@ const App: React.FC = () => {
           <DraggedItem
             item={selectedItem}
             position={mousePosition} // You’ll need to track this with `onMouseMove`
-            cellSize={64}
+            cellSize={92}
           />
         )}
         {showSplitModal && splitItem && (

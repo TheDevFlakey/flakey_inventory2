@@ -12,6 +12,7 @@ interface Item {
   width: number;
   height: number;
   owner: string;
+  durability: number;
   quantity?: number;
 }
 
@@ -85,11 +86,24 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         </div>
       </div>
       {item.quantity && item.quantity > 1 && (
-        <span className="absolute top-1 right-1 text-[10px] text-white bg-black/40 px-1 rounded">
+        <span className="absolute top-1 right-1 text-[10px] text-white bg-black/40 px-1 rounded-sm">
           x{item.quantity}
         </span>
       )}
-      <span className="absolute bottom-1 left-1 text-[10px] text-white bg-black/40 px-1 rounded">
+      {/* Durability bar */}
+      <div
+        className={`absolute bottom-0 left-0 h-full w-[4px] bg-black/40 ${
+          item.durability > 60
+            ? "bg-blue-400"
+            : item.durability > 30
+            ? "bg-yellow-400"
+            : "bg-red-400"
+        }`}
+        style={{
+          height: `${(item.durability / 100) * 100}%`,
+        }}
+      ></div>
+      <span className="absolute bottom-1 left-2 text-[10px] text-white bg-black/40 px-1 rounded-sm">
         {(
           (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
         ).toFixed(2)}
@@ -101,7 +115,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         }`}
         style={{ top: tooltipPos.y, left: tooltipPos.x }}
       >
-        <div className="bg-black/90 text-white text-[11px] px-2 py-1 rounded shadow-lg border border-white/10 whitespace-nowrap">
+        <div className="bg-black/90 flex flex-col text-white text-[11px] px-2 py-1 rounded shadow-lg border border-white/10 whitespace-nowrap">
           <div className="font-bold">
             {item.quantity || 1}x {item.label}
           </div>
@@ -110,12 +124,13 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
               {ItemDefinitions[item.label]?.description}
             </div>
           )}
-          <div className="text-white/50 text-[10px]">
+          <div className="text-white/70">
             {(
               (ItemDefinitions[item.label]?.weight ?? 0) * (item.quantity || 1)
             ).toFixed(2)}
             kg
           </div>
+          <div className="text-white/70">Durability: {item.durability}%</div>
         </div>
       </div>
     </div>
