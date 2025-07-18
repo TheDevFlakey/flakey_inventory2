@@ -316,7 +316,7 @@ const App: React.FC = () => {
             }}
           />
         )}
-        <div className="min-h-screen bg-black/50 text-white flex items-center p-8 space-x-20 justify-center select-none">
+        <div className="min-h-screen bg-black/90 text-white flex items-center p-8 space-x-20 justify-center select-none">
           <div>
             <InventoryWeight
               items={getDisplayItems(1)}
