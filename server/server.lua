@@ -5,12 +5,22 @@ AddEventHandler("fl_inventory:requestItems", function(secondaryId)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
 
-    local items = MySQL.query.await("SELECT * FROM flakey_inventory WHERE owner = @owner", {
+    local secondaryId = secondaryId or 0
+
+    local firstItems = MySQL.query.await("SELECT * FROM flakey_inventory WHERE owner = @owner", {
         ['@owner'] = owner
     })
 
-    if not Flakey_Inventories[owner] then
-        Flakey_Inventories[owner] = items or {}
+    Flakey_Inventories[owner] = firstItems or {}
+
+    local secondaryItems = MySQL.query.await("SELECT * FROM flakey_inventory WHERE owner = @owner", {
+        ['@owner'] = secondaryId
+    })
+
+    if secondaryItems and #secondaryItems > 0 then
+        for _, item in ipairs(secondaryItems) do
+            table.insert(Flakey_Inventories[owner], item)
+        end
     end
 
     TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner])
@@ -20,6 +30,11 @@ RegisterServerEvent("fl_inventory:moveItem")
 AddEventHandler("fl_inventory:moveItem", function(data)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
+
+    local toOwner = owner
+    if data.toInventory == 2 then
+        toOwner = data.secondaryId
+    end
 
     for _, item in pairs(Flakey_Inventories[owner] or {}) do
         if item.label == data.label and
@@ -34,23 +49,24 @@ AddEventHandler("fl_inventory:moveItem", function(data)
             item.inventoryId = data.toInventory
             item.width = data.width
             item.height = data.height
+            item.owner = toOwner
         end
     end
-    
 
     -- Update DB: move item
-    MySQL.update.await([[
+    local sql = MySQL.update.await([[
         UPDATE flakey_inventory
-        SET gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
+        SET owner = @toOwner, gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
         WHERE owner = @owner AND label = @label AND width = @originalWidth AND height = @originalHeight
         AND gridX = @fromX AND gridY = @fromY AND inventoryId = @fromInventory
     ]], {
+        ['@toOwner'] = toOwner,
         ['@toX'] = data.toX,
         ['@toY'] = data.toY,
         ['@toInventory'] = data.toInventory,
         ['@width'] = data.width,
         ['@height'] = data.height,
-        ['@owner'] = owner,
+        ['@owner'] = data.owner,
         ['@label'] = data.label,
         ['@originalWidth'] = data.originalWidth,
         ['@originalHeight'] = data.originalHeight,
@@ -59,8 +75,9 @@ AddEventHandler("fl_inventory:moveItem", function(data)
         ['@fromInventory'] = data.fromInventory,
     })
 
-
-    TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner] or {})
+    if sql then
+        TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner] or {})
+    end
 end)
 
 RegisterServerEvent("fl_inventory:moveItemSplit")
@@ -68,6 +85,11 @@ AddEventHandler("fl_inventory:moveItemSplit", function(data)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
     local moved = 0
+
+    local toOwner = owner
+    if data.toInventory == 2 then
+        toOwner = data.secondaryId
+    end
 
     for _, item in pairs(Flakey_Inventories[owner]) do
         if moved >= (data.amount or 1) then break end
@@ -84,24 +106,26 @@ AddEventHandler("fl_inventory:moveItemSplit", function(data)
             item.inventoryId = data.toInventory
             item.width = data.width
             item.height = data.height
+            item.owner = toOwner
 
             moved = moved + 1
         end
     end
 
     -- Update DB: move item
-    MySQL.update.await([[
+    local sql = MySQL.update.await([[
         UPDATE flakey_inventory
-        SET gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
+        SET owner = @toOwner, gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
         WHERE owner = @owner AND label = @label AND width = @originalWidth AND height = @originalHeight
         AND gridX = @fromX AND gridY = @fromY AND inventoryId = @fromInventory LIMIT @limit
     ]], {
+        ['@toOwner'] = toOwner,
         ['@toX'] = data.toX,
         ['@toY'] = data.toY,
         ['@toInventory'] = data.toInventory,
         ['@width'] = data.width,
         ['@height'] = data.height,
-        ['@owner'] = owner,
+        ['@owner'] = data.owner,
         ['@label'] = data.label,
         ['@originalWidth'] = data.originalWidth,
         ['@originalHeight'] = data.originalHeight,
@@ -111,7 +135,9 @@ AddEventHandler("fl_inventory:moveItemSplit", function(data)
         ['@limit'] = data.amount or 1,  -- Limit the number of items moved
     })
 
-    TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner] or {})
+    if sql then
+        TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner] or {})
+    end
 end)
 
 RegisterServerEvent("fl_inventory:stackItem")
@@ -119,6 +145,11 @@ AddEventHandler("fl_inventory:stackItem", function(data)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
     local inventory = Flakey_Inventories[owner] or {}
+
+    local toOwner = owner
+    if data.toInventory == 2 then
+        toOwner = data.secondaryId
+    end
 
     -- Find all matching items in the source stack
     local toStack = {}
@@ -142,22 +173,24 @@ AddEventHandler("fl_inventory:stackItem", function(data)
         item.inventoryId = data.toInventory
         item.width = data.width
         item.height = data.height
+        item.owner = toOwner
         table.insert(inventory, item)
     end
 
     -- Update DB: move all matching items
-    MySQL.update.await([[
+    local sql = MySQL.update.await([[
         UPDATE flakey_inventory
-        SET gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
+        SET owner = @toOwner, gridX = @toX, gridY = @toY, inventoryId = @toInventory, width = @width, height = @height
         WHERE owner = @owner AND label = @label AND width = @originalWidth AND height = @originalHeight
         AND gridX = @fromX AND gridY = @fromY AND inventoryId = @fromInventory
     ]], {
+        ['@toOwner'] = toOwner,
         ['@toX'] = data.toX,
         ['@toY'] = data.toY,
         ['@toInventory'] = data.toInventory,
         ['@width'] = data.width,
         ['@height'] = data.height,
-        ['@owner'] = owner,
+        ['@owner'] = data.owner,
         ['@label'] = data.label,
         ['@originalWidth'] = data.originalWidth,
         ['@originalHeight'] = data.originalHeight,
@@ -167,7 +200,9 @@ AddEventHandler("fl_inventory:stackItem", function(data)
     })
 
     -- Refresh client with updated inventory
-    TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+    if sql then
+        TriggerClientEvent("fl_inventory:sendItems", src, inventory)
+    end
 end)
 
 CreateThread(function()

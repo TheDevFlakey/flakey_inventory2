@@ -32,6 +32,7 @@ const App: React.FC = () => {
   const [showSplitModal, setShowSplitModal] = useState(false);
   const [splitModalPosition, setSplitModalPosition] = useState({ x: 0, y: 0 });
   const [splitItem, setSplitItem] = useState<Item | null>(null);
+  const [secondaryId, setSecondaryId] = useState<number | null>(null);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [splittingItem, setSplittingItem] = useState<{
@@ -46,6 +47,10 @@ const App: React.FC = () => {
   useNuiEvent("setInventoryVisible", (data) => {
     setVisible(data.visible);
     setItems(data.items);
+  });
+
+  useNuiEvent("setSecondaryId", (data) => {
+    setSecondaryId(data.secondaryId);
   });
 
   useEffect(() => {
@@ -103,6 +108,8 @@ const App: React.FC = () => {
               height: item.height,
               originalWidth: item.originalWidth ?? item.width,
               originalHeight: item.originalHeight ?? item.height,
+              owner: item.owner,
+              secondaryId: secondaryId,
             });
 
             setSelectedItem(null);
@@ -176,6 +183,8 @@ const App: React.FC = () => {
         originalWidth: itemToMove.originalWidth ?? itemToMove.width,
         originalHeight: itemToMove.originalHeight ?? itemToMove.height,
         amount: splittingItem.amount,
+        owner: itemToMove.owner,
+        secondaryId: secondaryId,
       });
 
       setSelectedItem(null);
@@ -211,6 +220,8 @@ const App: React.FC = () => {
         height: selectedItem.height,
         originalWidth: selectedItem.originalWidth,
         originalHeight: selectedItem.originalHeight,
+        owner: selectedItem.owner,
+        secondaryId: secondaryId,
       });
     } else {
       fetchNui("moveItem", {
@@ -225,6 +236,8 @@ const App: React.FC = () => {
         height: selectedItem.height,
         originalWidth: selectedItem.originalWidth,
         originalHeight: selectedItem.originalHeight,
+        owner: selectedItem.owner,
+        secondaryId: secondaryId,
       });
     }
 

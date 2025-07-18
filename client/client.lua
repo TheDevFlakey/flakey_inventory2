@@ -1,6 +1,13 @@
 RegisterCommand("open:inv", function()
+    TriggerEvent("fl_inventory:openInventory", 1421142)
+end)
+
+RegisterNetEvent("fl_inventory:openInventory", function(secondaryId)
     SetNuiFocus(true, true)
-    TriggerServerEvent("fl_inventory:requestItems", 123456)
+    TriggerServerEvent("fl_inventory:requestItems", secondaryId or 0)
+    SendReactMessage("setSecondaryId", {
+        secondaryId = secondaryId
+    })
 end)
 
 RegisterNetEvent("fl_inventory:sendItems", function(items)
