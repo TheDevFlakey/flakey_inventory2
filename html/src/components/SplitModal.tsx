@@ -10,7 +10,7 @@ const SplitModal = ({ item, onConfirm, onCancel }: any) => {
         <input
           type="range"
           min={1}
-          max={item.quantity - 1}
+          max={item.quantity}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           className="w-full mb-2"
@@ -18,7 +18,7 @@ const SplitModal = ({ item, onConfirm, onCancel }: any) => {
         <input
           type="number"
           min={1}
-          max={item.quantity - 1}
+          max={item.quantity}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           className="w-full text-black mb-4 p-1"

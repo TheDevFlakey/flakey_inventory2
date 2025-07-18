@@ -27,8 +27,8 @@ RegisterNUICallback("stackItem", function(data, cb)
     cb({ success = true })
 end)
 
-RegisterNUICallback("splitItem", function(data, cb)
-    TriggerServerEvent("fl_inventory:splitItem", data)
+RegisterNUICallback("moveItemSplit", function(data, cb)
+    TriggerServerEvent("fl_inventory:moveItemSplit", data)
     cb({ success = true })
 end)
 

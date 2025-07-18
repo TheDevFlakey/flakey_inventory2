@@ -192,21 +192,39 @@ const App: React.FC = () => {
     if (!valid) return; // Prevent invalid drop
 
     if (splittingItem) {
-      // Handle splitting logic here (TODO: Implement split logic)
-      fetchNui("splitItem", {
-        label: splittingItem.label,
-        fromX: splittingItem.oldX,
-        fromY: splittingItem.oldY,
-        fromInventory: selectedItem.inventoryId,
+      // Find items in original cell
+      const matchingItems = items.filter(
+        (i) =>
+          i.gridX === splittingItem.oldX &&
+          i.gridY === splittingItem.oldY &&
+          i.label === splittingItem.label &&
+          i.width === splittingItem.oldWidth &&
+          i.height === splittingItem.oldHeight &&
+          i.inventoryId === selectedItem?.inventoryId
+      );
+
+      if (matchingItems.length < splittingItem.amount) {
+        console.warn("Not enough items to split.");
+        return;
+      }
+
+      const itemToMove = matchingItems[0];
+
+      fetchNui("moveItemSplit", {
+        label: itemToMove.label,
+        fromX: itemToMove.gridX,
+        fromY: itemToMove.gridY,
+        fromInventory: itemToMove.inventoryId,
         toX: x,
         toY: y,
         toInventory: inventoryId,
-        width: splittingItem.oldWidth,
-        height: splittingItem.oldHeight,
+        width: selectedItem.width,
+        height: selectedItem.height,
+        originalWidth: itemToMove.originalWidth ?? itemToMove.width,
+        originalHeight: itemToMove.originalHeight ?? itemToMove.height,
         amount: splittingItem.amount,
-        originalWidth: selectedItem.originalWidth,
-        originalHeight: selectedItem.originalHeight,
       });
+
       setSelectedItem(null);
       setSplittingItem(null);
       return;
