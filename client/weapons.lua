@@ -44,14 +44,12 @@ AddEventHandler("fl_inventory:addAmmo", function(ammoType, amount)
 
     if currentWeapon == `WEAPON_UNARMED` then
         print("No weapon equipped.")
-        TriggerEvent("fl_inventory:notification", "No Weapon", 0, "Equip a weapon first.")
         return
     end
 
     local allowed = ammoCompatibility[ammoType] and ammoCompatibility[ammoType][currentWeapon]
     if not allowed then
         print("Incompatible ammo type for current weapon.")
-        TriggerEvent("fl_inventory:notification", "Wrong Ammo", 0, "This ammo doesn't fit your weapon.")
         return
     end
 
@@ -64,8 +62,6 @@ AddEventHandler("fl_inventory:addAmmo", function(ammoType, amount)
     RequestAnimDict("reload@pistol")
     while not HasAnimDictLoaded("reload@pistol") do Wait(10) end
     TaskPlayAnim(ped, "reload@pistol", "reload", 8.0, -8.0, 1000, 48, 0, false, false, false)
-
-    TriggerEvent("fl_inventory:notification", GetLabelText(GetWeaponNameFromHash(currentWeapon)), currentWeapon, ("Loaded %s ammo"):format(amount))
 end)
 
 -- Weapon give/holster/unholster logic
