@@ -9,7 +9,7 @@ import { canPlaceItemAt } from "../utils/inventoryUtils"; // Assuming this funct
 import SplitModal from "./SplitModal"; // Assuming you have a SplitModal component
 import InventoryWeight from "./InventoryWeight"; // Assuming you have an InventoryWeight component
 import { ItemDefinitions } from "../utils/itemDefinitions";
-import InventoryNotifications from "./InventoryNotifications"; // Assuming you have an InventoryNotifications component
+import InventoryNotifications from "./notifications/InventoryNotifications"; // Assuming you have an InventoryNotifications component
 
 interface Item {
   id: number;
@@ -287,6 +287,8 @@ const App: React.FC = () => {
       id: item.id,
       useEvent: ItemDefinitions[item.item_id]?.useEvent || "",
       removeOnUse: ItemDefinitions[item.item_id]?.removeOnUse || false,
+      weaponName: ItemDefinitions[item.item_id]?.weaponName || false,
+      ammoType: ItemDefinitions[item.item_id]?.ammoType || false,
     });
     setSelectedItem(null);
     setShowSplitModal(false);

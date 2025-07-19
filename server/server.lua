@@ -296,13 +296,20 @@ AddEventHandler("fl_inventory:useItem", function(data)
     local inventory = Flakey_Inventories[owner] or {}
     for _, item in pairs(inventory) do
         if item.label == data.label and item.id == data.id then
+            if data.weaponName then
+                TriggerClientEvent("fl_inventory:giveWeapon", src, data.weaponName)
+            elseif data.ammoType then
+                TriggerClientEvent("fl_inventory:addAmmo", src, data.ammoType, 50)
+            else
+                TriggerClientEvent(data.useEvent, src)
+            end
+            TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, "Used")
             if data.removeOnUse then
                 MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", { 
                     ['@id'] = item.id
                 })
+                TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, "Removed")
             end
-            TriggerClientEvent(data.useEvent, src)
-            TriggerClientEvent("fl_inventory:itemUsedNotification", src, item.label, item.item_id)
             break
         end
     end

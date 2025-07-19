@@ -30,5 +30,17 @@ export const ItemDefinitions = {
     image: "./icons/weapon_microsmg.png",
     useEvent: "fl_inventory:useWeaponMicroSMG",
     removeOnUse: false,
+    weaponName: "WEAPON_MICROSMG",
+  },
+  11114: {
+    label: "SMG Ammo",
+    description: "A box of SMG ammunition",
+    weight: 0.5,
+    width: 1,
+    height: 1,
+    image: "./icons/smg_ammopack.png",
+    useEvent: "",
+    removeOnUse: false,
+    ammoType: "smg",
   },
 };

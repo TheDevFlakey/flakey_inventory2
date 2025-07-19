@@ -45,8 +45,8 @@ RegisterNUICallback("useItem", function(data, cb)
     cb({ success = true })
 end)
 
-RegisterNetEvent("fl_inventory:itemUsedNotification", function(label, item_id)
-    SendReactMessage("showItemUsedNotification", { label = label, item_id = item_id })
+RegisterNetEvent("fl_inventory:notification", function(label, item_id, msg)
+    SendReactMessage("showNotification", { label = label, item_id = item_id, msg = msg })
 end)
 
 RegisterKeyMapping("open:inv", "Open Inventory", "keyboard", "F2")
