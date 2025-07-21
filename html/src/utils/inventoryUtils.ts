@@ -10,7 +10,8 @@ export const canPlaceItemAt = (
   if (!item) return false;
 
   if (x + item.width > gridWidth || y + item.height > gridHeight) return false;
-  if (inventoryId == 69 && item.width > 1 && item.height > 1) return false;
+  console.log(inventoryId);
+  if (inventoryId == 69 && (item.width > 1 || item.height > 1)) return false;
 
   for (let dx = 0; dx < item.width; dx++) {
     for (let dy = 0; dy < item.height; dy++) {
