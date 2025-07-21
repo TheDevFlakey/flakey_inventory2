@@ -100,7 +100,12 @@ const App: React.FC = () => {
   const onItemClick = (item: Item, e?: React.MouseEvent) => {
     console.log("Item clicked:", item.image);
     if (e?.ctrlKey) {
-      const targetInventory = item.inventoryId === 1 ? 2 : 1;
+      const targetInventory =
+        item.inventoryId === 1 && showStatus
+          ? 69
+          : item.inventoryId == 1
+          ? 2
+          : 1;
 
       const stackTargets = items.filter((i) => {
         return (
@@ -441,13 +446,11 @@ const App: React.FC = () => {
               <div className="my-auto mr-auto">
                 {showStatus ? (
                   <>
-                    <div className="opacity-0">
-                      <InventoryWeight
-                        items={getDisplayItems(2)}
-                        label="Ground Inventory"
-                        maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
-                      />
-                    </div>
+                    <InventoryWeight
+                      items={getDisplayItems(69)}
+                      label="Ground Inventory"
+                      maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
+                    />
 
                     <div className="h-[600px] bg-white/5 border border-white/10 w-[552px] p-4 flex flex-col justify-between">
                       {/* Skeleton image */}
@@ -459,7 +462,21 @@ const App: React.FC = () => {
                         />
                       </div>
                       {/* Hotbar slots */}
-                      <Hotbar />
+                      <Hotbar
+                        items={getDisplayItems(69)}
+                        selectedItem={selectedItem}
+                        onCellClick={onCellClick}
+                        onItemClick={onItemClick}
+                        onRightClick={(item, position) => {
+                          setSplitItem(item);
+                          setShowSplitModal(true);
+                          setSplitModalPosition({
+                            x: position.x,
+                            y: position.y,
+                          });
+                        }}
+                        inventoryId={69} // Use a unique inventoryId like -2 for hotbar
+                      />
                     </div>
                   </>
                 ) : (
