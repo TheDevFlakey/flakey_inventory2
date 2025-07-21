@@ -9,6 +9,7 @@ import { canPlaceItemAt } from "../utils/inventoryUtils"; // Assuming this funct
 import SplitModal from "./SplitModal"; // Assuming you have a SplitModal component
 import InventoryWeight from "./InventoryWeight"; // Assuming you have an InventoryWeight component
 import InventoryNotifications from "./notifications/InventoryNotifications"; // Assuming you have an InventoryNotifications component
+import Hotbar from "./Hotbar";
 
 interface Item {
   id: number;
@@ -428,18 +429,39 @@ const App: React.FC = () => {
                 />
               </div>
             </div>
-
-            <div className="absolute top-0 right-0 p-4">
-              <button onClick={() => setShowStatus(!showStatus)}>
-                Toggle Status Inventory
-              </button>
-            </div>
-            <div className="w-1/2 flex">
+            <div className="w-1/2 flex relative">
+              <div className="absolute left-0 top-36">
+                <button
+                  className="flex py-2 px-4 bg-white/10 font-semibold text-sm"
+                  onClick={() => setShowStatus(!showStatus)}
+                >
+                  Toggle Inventory
+                </button>
+              </div>
               <div className="my-auto mr-auto">
                 {showStatus ? (
-                  <div className="">
-                    <p>Status Inventory</p>
-                  </div>
+                  <>
+                    <div className="opacity-0">
+                      <InventoryWeight
+                        items={getDisplayItems(2)}
+                        label="Ground Inventory"
+                        maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
+                      />
+                    </div>
+
+                    <div className="h-[600px] bg-white/5 border border-white/10 w-[552px] p-4 flex flex-col justify-between">
+                      {/* Skeleton image */}
+                      <div className="flex justify-center items-center h-full">
+                        <img
+                          src="./images/player_skeleton.png" // Replace with your actual path
+                          alt="Player Skeleton"
+                          className="h-[400px] opacity-70"
+                        />
+                      </div>
+                      {/* Hotbar slots */}
+                      <Hotbar />
+                    </div>
+                  </>
                 ) : (
                   <>
                     <InventoryWeight

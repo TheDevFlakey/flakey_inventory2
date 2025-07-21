@@ -10,6 +10,7 @@ files {
     'html/dist/index.html',
     'html/dist/assets/*',
     'html/dist/icons/*.png',
+    'html/dist/images/*.png',
 }
 
 client_script "client/**/*"
