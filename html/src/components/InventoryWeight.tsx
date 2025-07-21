@@ -1,16 +1,10 @@
-import { ItemDefinitions } from "../utils/itemDefinitions";
-
 const InventoryWeight: React.FC<{
   items: Item[];
   label: string;
   maxInventoryWeight: number;
 }> = ({ items, label, maxInventoryWeight }) => {
   const totalWeight = items.reduce((total, item) => {
-    const definition = ItemDefinitions[item.item_id];
-    if (definition && definition.weight) {
-      return total + definition.weight * (item.quantity || 1);
-    }
-    return total;
+    return total + item.weight * (item.quantity || 1);
   }, 0);
 
   return (
@@ -25,7 +19,12 @@ const InventoryWeight: React.FC<{
       <div className="w-full h-2 bg-white/20 overflow-hidden">
         <div
           className="h-full bg-blue-400"
-          style={{ width: `${Math.min(totalWeight, 100)}%` }}
+          style={{
+            width: `${Math.min(
+              (totalWeight / maxInventoryWeight) * 100,
+              100
+            )}%`,
+          }}
         ></div>
       </div>
     </div>

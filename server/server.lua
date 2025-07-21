@@ -1,4 +1,7 @@
 local Flakey_Inventories = {}
+local Inventory_MaxWeights = {
+    [1421142] = 1000,
+}
 
 RegisterServerEvent("fl_inventory:requestItems")
 AddEventHandler("fl_inventory:requestItems", function(secondaryId)
@@ -23,7 +26,21 @@ AddEventHandler("fl_inventory:requestItems", function(secondaryId)
         end
     end
 
+    -- Add all item definitions to the items
+    for _, item in ipairs(Flakey_Inventories[owner]) do
+        local definition = ItemDefinitions[item.item_id]
+        if definition then
+            item.weight = definition.weight or 0
+            item.image = definition.image or "./icons/default.png"
+            item.useEvent = definition.useEvent or ""
+            item.removeOnUse = definition.removeOnUse or false
+            item.weaponName = definition.weaponName or ""
+            item.ammoType = definition.ammoType or ""
+        end
+    end
+
     TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner])
+    TriggerClientEvent("fl_inventory:setSecondaryMaxWeight", src, Inventory_MaxWeights[secondaryId])
 end)
 
 RegisterServerEvent("fl_inventory:moveItem")
@@ -34,6 +51,33 @@ AddEventHandler("fl_inventory:moveItem", function(data)
     local toOwner = owner
     if data.toInventory == 2 then
         toOwner = data.secondaryId
+    end
+
+    if data.toInventory ~= data.fromInventory then
+        local currentWeight = 0
+        local maxWeight = Inventory_MaxWeights[toOwner] or 250
+        for _, item in pairs(Flakey_Inventories[owner]) do
+            if item.inventoryId == data.toInventory then
+                currentWeight = currentWeight + (item.weight)
+            end
+        end
+
+        local itemWeight = 0
+
+        for _, item in pairs(Flakey_Inventories[owner] or {}) do
+            if item.label == data.label and
+            item.gridX == data.fromX and
+            item.gridY == data.fromY and
+            item.inventoryId == data.fromInventory and
+            item.width == data.originalWidth and
+            item.height == data.originalHeight then
+                itemWeight = itemWeight + item.weight
+            end
+        end
+
+        if currentWeight + itemWeight > maxWeight then
+            return
+        end
     end
 
     for _, item in pairs(Flakey_Inventories[owner] or {}) do
@@ -85,10 +129,40 @@ AddEventHandler("fl_inventory:moveItemSplit", function(data)
     local src = source
     local owner = exports["flakey_core"]:activeCharacter()[src]
     local moved = 0
+    local moved2 = 0
 
     local toOwner = owner
     if data.toInventory == 2 then
         toOwner = data.secondaryId
+    end
+
+    if data.toInventory ~= data.fromInventory then
+        local currentWeight = 0
+        local maxWeight = Inventory_MaxWeights[toOwner] or 250
+        for _, item in pairs(Flakey_Inventories[owner]) do
+            if item.inventoryId == data.toInventory then
+                currentWeight = currentWeight + (item.weight)
+            end
+        end
+
+        local itemWeight = 0
+
+        for _, item in pairs(Flakey_Inventories[owner] or {}) do
+            if moved2 >= (data.amount or 1) then break end
+            if item.label == data.label and
+            item.gridX == data.fromX and
+            item.gridY == data.fromY and
+            item.inventoryId == data.fromInventory and
+            item.width == data.originalWidth and
+            item.height == data.originalHeight then
+                itemWeight = itemWeight + item.weight
+                moved2 = moved2 + 1
+            end
+        end
+
+        if currentWeight + itemWeight > maxWeight then
+            return
+        end
     end
 
     for _, item in pairs(Flakey_Inventories[owner]) do
@@ -149,6 +223,33 @@ AddEventHandler("fl_inventory:stackItem", function(data)
     local toOwner = owner
     if data.toInventory == 2 then
         toOwner = data.secondaryId
+    end
+
+        if data.toInventory ~= data.fromInventory then
+        local currentWeight = 0
+        local maxWeight = Inventory_MaxWeights[toOwner] or 250
+        for _, item in pairs(Flakey_Inventories[owner]) do
+            if item.inventoryId == data.toInventory then
+                currentWeight = currentWeight + (item.weight)
+            end
+        end
+
+        local itemWeight = 0
+
+        for _, item in pairs(Flakey_Inventories[owner] or {}) do
+            if item.label == data.label and
+            item.gridX == data.fromX and
+            item.gridY == data.fromY and
+            item.inventoryId == data.fromInventory and
+            item.width == data.originalWidth and
+            item.height == data.originalHeight then
+                itemWeight = itemWeight + item.weight
+            end
+        end
+
+        if currentWeight + itemWeight > maxWeight then
+            return
+        end
     end
 
     -- Find all matching items in the source stack
@@ -303,12 +404,12 @@ AddEventHandler("fl_inventory:useItem", function(data)
             else
                 TriggerClientEvent(data.useEvent, src)
             end
-            TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, "Used")
+            TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, item.image, "Used")
             if data.removeOnUse then
                 MySQL.query.await("DELETE FROM flakey_inventory WHERE id = @id", { 
                     ['@id'] = item.id
                 })
-                TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, "Removed")
+                TriggerClientEvent("fl_inventory:notification", src, item.label, item.item_id, item.image, "Removed")
             end
             break
         end

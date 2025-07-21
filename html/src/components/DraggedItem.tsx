@@ -1,7 +1,6 @@
 /** @format */
 
 import React from "react";
-import { ItemDefinitions } from "../utils/itemDefinitions";
 
 interface DraggedItemProps {
   item: {
@@ -9,6 +8,8 @@ interface DraggedItemProps {
     width: number;
     height: number;
     quantity?: number;
+    image: string;
+    weight: number;
   };
   position: { x: number; y: number };
   cellSize: number;
@@ -19,8 +20,8 @@ const DraggedItem: React.FC<DraggedItemProps> = ({
   position,
   cellSize,
 }) => {
-  const image = ItemDefinitions[item.item_id]?.image || "";
-  const weight = ItemDefinitions[item.item_id]?.weight || 0;
+  const image = item.image || "";
+  const weight = item.weight || 0;
 
   return (
     <div

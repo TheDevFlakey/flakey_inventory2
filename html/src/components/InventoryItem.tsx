@@ -1,7 +1,6 @@
 /** @format */
 
 import React, { useState } from "react";
-import { ItemDefinitions } from "../utils/itemDefinitions";
 
 interface Item {
   id: number;
@@ -14,6 +13,14 @@ interface Item {
   owner: string;
   durability: number;
   quantity?: number;
+  image: string;
+  weight: number;
+  description: string;
+  useEvent?: string;
+  removeOnUse?: boolean;
+  weaponName?: string;
+  ammoType?: string;
+  maxStack?: number;
 }
 
 interface InventoryItemProps {
@@ -78,7 +85,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         <div className="flex flex-col items-center justify-center w-full h-full p-1">
           <div className="w-[70%] h-[70%] flex items-center justify-center">
             <img
-              src={ItemDefinitions[item.item_id]?.image || ""}
+              src={item.image || ""}
               alt={item.label}
               className="max-w-full max-h-full object-contain pointer-events-none"
             />
@@ -104,9 +111,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         }}
       ></div>
       <span className="absolute bottom-1 left-2 text-[10px] text-white bg-black/40 px-1 rounded-sm">
-        {(
-          (ItemDefinitions[item.item_id]?.weight ?? 0) * (item.quantity || 1)
-        ).toFixed(2)}
+        {((item.weight ?? 0) * (item.quantity || 1)).toFixed(2)}
         kg
       </span>
       <div
@@ -119,16 +124,11 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
           <div className="font-bold">
             {item.quantity || 1}x {item.label}
           </div>
-          {ItemDefinitions[item.item_id]?.description && (
-            <div className="text-white/70">
-              {ItemDefinitions[item.item_id]?.description}
-            </div>
+          {item.description && (
+            <div className="text-white/70">{item.description}</div>
           )}
           <div className="text-white/70">
-            {(
-              (ItemDefinitions[item.item_id]?.weight ?? 0) *
-              (item.quantity || 1)
-            ).toFixed(2)}
+            {((item.weight ?? 0) * (item.quantity || 1)).toFixed(2)}
             kg
           </div>
           <div className="text-white/70">Durability: {item.durability}%</div>

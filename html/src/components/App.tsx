@@ -8,7 +8,6 @@ import DraggedItem from "./DraggedItem";
 import { canPlaceItemAt } from "../utils/inventoryUtils"; // Assuming this function is exported from InventoryGrid
 import SplitModal from "./SplitModal"; // Assuming you have a SplitModal component
 import InventoryWeight from "./InventoryWeight"; // Assuming you have an InventoryWeight component
-import { ItemDefinitions } from "../utils/itemDefinitions";
 import InventoryNotifications from "./notifications/InventoryNotifications"; // Assuming you have an InventoryNotifications component
 
 interface Item {
@@ -24,6 +23,14 @@ interface Item {
   originalHeight?: number;
   durability: number;
   item_id: number;
+  image: string;
+  weight: number;
+  description: string;
+  useEvent?: string;
+  removeOnUse?: boolean;
+  weaponName?: string;
+  ammoType?: string;
+  maxStack?: number;
 }
 
 const GRID_WIDTH = 6;
@@ -36,6 +43,7 @@ const App: React.FC = () => {
   const [splitModalPosition, setSplitModalPosition] = useState({ x: 0, y: 0 });
   const [splitItem, setSplitItem] = useState<Item | null>(null);
   const [secondaryId, setSecondaryId] = useState<number | null>(null);
+  const [secondaryMaxWeight, setSecondaryMaxWeight] = useState<number>(250); // Default max weight for secondary inventory
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [splittingItem, setSplittingItem] = useState<{
@@ -45,11 +53,17 @@ const App: React.FC = () => {
     oldWidth: number;
     oldHeight: number;
     amount: number;
+    image: string;
+    weight: number;
   } | null>(null);
 
   useNuiEvent("setInventoryVisible", (data) => {
     setVisible(data.visible);
     setItems(data.items);
+  });
+
+  useNuiEvent("setSecondaryMaxWeight", (data) => {
+    setSecondaryMaxWeight(data.secondaryMaxWeight || 250);
   });
 
   useNuiEvent("setSecondaryId", (data) => {
@@ -81,7 +95,7 @@ const App: React.FC = () => {
   }, []);
 
   const onItemClick = (item: Item, e?: React.MouseEvent) => {
-    console.log("Item clicked:", e);
+    console.log("Item clicked:", item.image);
     if (e?.ctrlKey) {
       const targetInventory = item.inventoryId === 1 ? 2 : 1;
 
@@ -317,10 +331,10 @@ const App: React.FC = () => {
       height: item.height,
       owner: item.owner,
       id: item.id,
-      useEvent: ItemDefinitions[item.item_id]?.useEvent || "",
-      removeOnUse: ItemDefinitions[item.item_id]?.removeOnUse || false,
-      weaponName: ItemDefinitions[item.item_id]?.weaponName || false,
-      ammoType: ItemDefinitions[item.item_id]?.ammoType || false,
+      useEvent: item.useEvent || "",
+      removeOnUse: item.removeOnUse || false,
+      weaponName: item.weaponName || false,
+      ammoType: item.ammoType || false,
     });
     setSelectedItem(null);
     setShowSplitModal(false);
@@ -352,6 +366,8 @@ const App: React.FC = () => {
                   oldY: splitItem.gridY,
                   oldWidth: splitItem.width,
                   oldHeight: splitItem.height,
+                  image: splitItem.image,
+                  weight: splitItem.weight,
                   amount,
                 });
                 // setSelectedItem as splitItem but change x and y to -1
@@ -371,7 +387,7 @@ const App: React.FC = () => {
               <InventoryWeight
                 items={getDisplayItems(1)}
                 label="Player Inventory"
-                maxInventoryWeight={100} // Adjust this value as needed
+                maxInventoryWeight={250} // Adjust this value as needed
               />
               <InventoryGrid
                 inventoryId={1}
@@ -390,7 +406,7 @@ const App: React.FC = () => {
               <InventoryWeight
                 items={getDisplayItems(2)}
                 label="Ground Inventory"
-                maxInventoryWeight={200} // Adjust this value as needed
+                maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
               />
               <InventoryGrid
                 inventoryId={2}

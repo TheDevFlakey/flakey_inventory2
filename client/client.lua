@@ -10,10 +10,16 @@ RegisterNetEvent("fl_inventory:openInventory", function(secondaryId)
     })
 end)
 
-RegisterNetEvent("fl_inventory:sendItems", function(items)
+RegisterNetEvent("fl_inventory:sendItems", function(items, maxWeight)
     SendReactMessage("setInventoryVisible", {
         visible = true,
         items = items
+    })
+end)
+
+RegisterNetEvent("fl_inventory:setSecondaryMaxWeight", function(maxWeight)
+    SendReactMessage("setSecondaryMaxWeight", {
+        secondaryMaxWeight = maxWeight
     })
 end)
 
@@ -45,8 +51,8 @@ RegisterNUICallback("useItem", function(data, cb)
     cb({ success = true })
 end)
 
-RegisterNetEvent("fl_inventory:notification", function(label, item_id, msg)
-    SendReactMessage("showNotification", { label = label, item_id = item_id, msg = msg })
+RegisterNetEvent("fl_inventory:notification", function(label, item_id, image, msg)
+    SendReactMessage("showNotification", { label = label, item_id = item_id, image = image, msg = msg })
 end)
 
 RegisterKeyMapping("open:inv", "Open Inventory", "keyboard", "F2")

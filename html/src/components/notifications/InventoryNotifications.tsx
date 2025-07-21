@@ -1,6 +1,5 @@
 import { useNuiEvent } from "../../hooks/useNuiEvent";
 import React, { useEffect, useRef, useState } from "react";
-import { ItemDefinitions } from "../../utils/itemDefinitions";
 
 interface NotiData {
   label: string;
@@ -21,6 +20,7 @@ const InventoryNotifications: React.FC = () => {
         label: data.label,
         item_id: data.item_id,
         msg: data.msg,
+        image: data.image,
       },
     ]);
   });
@@ -49,7 +49,7 @@ const InventoryNotifications: React.FC = () => {
     }
   }, [queue, current]);
 
-  const itemImage = current ? ItemDefinitions[current.item_id]?.image : "";
+  const itemImage = current ? current.image : "";
 
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
