@@ -43,6 +43,7 @@ const App: React.FC = () => {
   const [secondaryMaxWeight, setSecondaryMaxWeight] = useState<number>(250); // Default max weight for secondary inventory
   const [GRID_WIDTH, setGridWidth] = useState(6);
   const [GRID_HEIGHT, setGridHeight] = useState(6);
+  const [showStatus, setShowStatus] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [splittingItem, setSplittingItem] = useState<{
@@ -403,48 +404,66 @@ const App: React.FC = () => {
               }}
             />
           )}
-          <div className="min-h-screen bg-black/90 text-white flex p-8 space-x-20 justify-center select-none">
-            <div className="mt-48">
-              <InventoryWeight
-                items={getDisplayItems(1)}
-                label="Player Inventory"
-                maxInventoryWeight={250} // Adjust this value as needed
-              />
-              <InventoryGrid
-                inventoryId={1}
-                items={getDisplayItems(1)}
-                selectedItem={selectedItem}
-                onCellClick={onCellClick}
-                onItemClick={onItemClick}
-                onRightClick={(item, position) => {
-                  setSplitItem(item);
-                  setShowSplitModal(true);
-                  setSplitModalPosition({ x: position.x, y: position.y });
-                }}
-                gridWidth={6}
-                gridHeight={12}
-              />
+          <div className="relative min-h-screen bg-black/90 text-white gap-x-32 flex p-8 select-none">
+            <div className="flex w-1/2">
+              <div className="my-auto ml-auto">
+                <InventoryWeight
+                  items={getDisplayItems(1)}
+                  label="Player Inventory"
+                  maxInventoryWeight={250} // Adjust this value as needed
+                />
+                <InventoryGrid
+                  inventoryId={1}
+                  items={getDisplayItems(1)}
+                  selectedItem={selectedItem}
+                  onCellClick={onCellClick}
+                  onItemClick={onItemClick}
+                  onRightClick={(item, position) => {
+                    setSplitItem(item);
+                    setShowSplitModal(true);
+                    setSplitModalPosition({ x: position.x, y: position.y });
+                  }}
+                  gridWidth={6}
+                  gridHeight={12}
+                />
+              </div>
             </div>
-            <div className="mt-48">
-              <InventoryWeight
-                items={getDisplayItems(2)}
-                label="Ground Inventory"
-                maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
-              />
-              <InventoryGrid
-                inventoryId={2}
-                items={getDisplayItems(2)}
-                selectedItem={selectedItem}
-                onCellClick={onCellClick}
-                onItemClick={onItemClick}
-                onRightClick={(item, position) => {
-                  setSplitItem(item);
-                  setShowSplitModal(true);
-                  setSplitModalPosition({ x: position.x, y: position.y });
-                }}
-                gridWidth={GRID_WIDTH}
-                gridHeight={GRID_HEIGHT}
-              />
+
+            <div className="absolute top-0 right-0 p-4">
+              <button onClick={() => setShowStatus(!showStatus)}>
+                Toggle Status Inventory
+              </button>
+            </div>
+            <div className="w-1/2 flex">
+              <div className="my-auto mr-auto">
+                {showStatus ? (
+                  <div className="">
+                    <p>Status Inventory</p>
+                  </div>
+                ) : (
+                  <>
+                    <InventoryWeight
+                      items={getDisplayItems(2)}
+                      label="Ground Inventory"
+                      maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
+                    />
+                    <InventoryGrid
+                      inventoryId={2}
+                      items={getDisplayItems(2)}
+                      selectedItem={selectedItem}
+                      onCellClick={onCellClick}
+                      onItemClick={onItemClick}
+                      onRightClick={(item, position) => {
+                        setSplitItem(item);
+                        setShowSplitModal(true);
+                        setSplitModalPosition({ x: position.x, y: position.y });
+                      }}
+                      gridWidth={GRID_WIDTH}
+                      gridHeight={GRID_HEIGHT}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </>

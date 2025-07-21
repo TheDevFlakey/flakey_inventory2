@@ -120,7 +120,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
 
   return (
     <div
-      className="relative max-h-[600px] overflow-auto no-scrollbar"
+      className="relative max-h-[600px] overflow-auto no-scrollbar "
       style={{
         width: gridWidth * CELL_SIZE,
         height: gridHeight * CELL_SIZE,
