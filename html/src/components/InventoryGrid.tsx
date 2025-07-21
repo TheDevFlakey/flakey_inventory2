@@ -37,7 +37,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
   onItemClick,
   onRightClick,
   gridWidth = 6,
-  gridHeight = 6,
+  gridHeight,
 }) => {
   const [hoveredCell, setHoveredCell] = useState<{
     x: number;
@@ -120,7 +120,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
 
   return (
     <div
-      className="relative"
+      className="relative max-h-[600px] overflow-auto no-scrollbar"
       style={{
         width: gridWidth * CELL_SIZE,
         height: gridHeight * CELL_SIZE,

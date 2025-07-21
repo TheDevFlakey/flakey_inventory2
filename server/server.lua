@@ -2,6 +2,9 @@ local Flakey_Inventories = {}
 local Inventory_MaxWeights = {
     [1421142] = 1000,
 }
+local Inventory_GridSizes = {
+    [1421142] = { width = 6, height = 12 },
+}
 
 RegisterServerEvent("fl_inventory:requestItems")
 AddEventHandler("fl_inventory:requestItems", function(secondaryId)
@@ -40,7 +43,7 @@ AddEventHandler("fl_inventory:requestItems", function(secondaryId)
     end
 
     TriggerClientEvent("fl_inventory:sendItems", src, Flakey_Inventories[owner])
-    TriggerClientEvent("fl_inventory:setSecondaryMaxWeight", src, Inventory_MaxWeights[secondaryId])
+    TriggerClientEvent("fl_inventory:setSecondaryMaxWeight", src, Inventory_MaxWeights[secondaryId], Inventory_GridSizes[secondaryId])
 end)
 
 RegisterServerEvent("fl_inventory:moveItem")

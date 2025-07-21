@@ -17,9 +17,10 @@ RegisterNetEvent("fl_inventory:sendItems", function(items, maxWeight)
     })
 end)
 
-RegisterNetEvent("fl_inventory:setSecondaryMaxWeight", function(maxWeight)
+RegisterNetEvent("fl_inventory:setSecondaryMaxWeight", function(maxWeight, gridSize)
     SendReactMessage("setSecondaryMaxWeight", {
-        secondaryMaxWeight = maxWeight
+        secondaryMaxWeight = maxWeight,
+        secondaryGridSize = gridSize
     })
 end)
 

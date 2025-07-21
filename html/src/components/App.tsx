@@ -33,9 +33,6 @@ interface Item {
   maxStack?: number;
 }
 
-const GRID_WIDTH = 6;
-const GRID_HEIGHT = 6;
-
 const App: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
@@ -44,6 +41,8 @@ const App: React.FC = () => {
   const [splitItem, setSplitItem] = useState<Item | null>(null);
   const [secondaryId, setSecondaryId] = useState<number | null>(null);
   const [secondaryMaxWeight, setSecondaryMaxWeight] = useState<number>(250); // Default max weight for secondary inventory
+  const [GRID_WIDTH, setGridWidth] = useState(6);
+  const [GRID_HEIGHT, setGridHeight] = useState(6);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [splittingItem, setSplittingItem] = useState<{
@@ -64,6 +63,8 @@ const App: React.FC = () => {
 
   useNuiEvent("setSecondaryMaxWeight", (data) => {
     setSecondaryMaxWeight(data.secondaryMaxWeight || 250);
+    setGridWidth(data.secondaryGridSize.width || 6);
+    setGridHeight(data.secondaryGridSize.height || 6);
   });
 
   useNuiEvent("setSecondaryId", (data) => {
@@ -131,9 +132,19 @@ const App: React.FC = () => {
         return;
       }
 
+      let TEMP_GRID_WIDTH = GRID_WIDTH;
+      let TEMP_GRID_HEIGHT = GRID_HEIGHT;
+      if (targetInventory === 1) {
+        TEMP_GRID_WIDTH = 6;
+        TEMP_GRID_HEIGHT = 12;
+      } else {
+        TEMP_GRID_WIDTH = GRID_WIDTH;
+        TEMP_GRID_HEIGHT = GRID_HEIGHT;
+      }
+
       // Try to find a valid position in the other inventory
-      for (let y = 0; y <= GRID_HEIGHT - item.height; y++) {
-        for (let x = 0; x <= GRID_WIDTH - item.width; x++) {
+      for (let y = 0; y <= TEMP_GRID_HEIGHT - item.height; y++) {
+        for (let x = 0; x <= TEMP_GRID_WIDTH - item.width; x++) {
           if (
             canPlaceItemAt(
               x,
@@ -141,8 +152,8 @@ const App: React.FC = () => {
               item,
               items,
               targetInventory,
-              GRID_WIDTH,
-              GRID_HEIGHT
+              TEMP_GRID_WIDTH,
+              TEMP_GRID_HEIGHT
             )
           ) {
             fetchNui("moveItem", {
@@ -186,14 +197,24 @@ const App: React.FC = () => {
   const onCellClick = (x: number, y: number, inventoryId: number) => {
     if (!selectedItem) return;
 
+    let TEMP_GRID_WIDTH = GRID_WIDTH;
+    let TEMP_GRID_HEIGHT = GRID_HEIGHT;
+    if (inventoryId === 1) {
+      TEMP_GRID_WIDTH = 6;
+      TEMP_GRID_HEIGHT = 12;
+    } else {
+      TEMP_GRID_WIDTH = GRID_WIDTH;
+      TEMP_GRID_HEIGHT = GRID_HEIGHT;
+    }
+
     const valid = canPlaceItemAt(
       x,
       y,
       selectedItem,
       items,
       inventoryId,
-      GRID_WIDTH,
-      GRID_HEIGHT
+      TEMP_GRID_WIDTH,
+      TEMP_GRID_HEIGHT
     );
 
     if (!valid) return; // Prevent invalid drop
@@ -382,8 +403,8 @@ const App: React.FC = () => {
               }}
             />
           )}
-          <div className="min-h-screen bg-black/90 text-white flex items-center p-8 space-x-20 justify-center select-none">
-            <div>
+          <div className="min-h-screen bg-black/90 text-white flex p-8 space-x-20 justify-center select-none">
+            <div className="mt-48">
               <InventoryWeight
                 items={getDisplayItems(1)}
                 label="Player Inventory"
@@ -400,9 +421,11 @@ const App: React.FC = () => {
                   setShowSplitModal(true);
                   setSplitModalPosition({ x: position.x, y: position.y });
                 }}
+                gridWidth={6}
+                gridHeight={12}
               />
             </div>
-            <div>
+            <div className="mt-48">
               <InventoryWeight
                 items={getDisplayItems(2)}
                 label="Ground Inventory"
@@ -419,6 +442,8 @@ const App: React.FC = () => {
                   setShowSplitModal(true);
                   setSplitModalPosition({ x: position.x, y: position.y });
                 }}
+                gridWidth={GRID_WIDTH}
+                gridHeight={GRID_HEIGHT}
               />
             </div>
           </div>
