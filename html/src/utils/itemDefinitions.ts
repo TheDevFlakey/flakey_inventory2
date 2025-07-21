@@ -10,6 +10,7 @@ export const ItemDefinitions = {
     image: "./icons/chair.png",
     useEvent: "fl_inventory:useChair",
     removeOnUse: true,
+    maxStack: 1,
   },
   11112: {
     label: "Brass",
@@ -20,6 +21,7 @@ export const ItemDefinitions = {
     image: "./icons/brass.png",
     useEvent: "fl_inventory:useBrass",
     removeOnUse: true,
+    maxStack: 100,
   },
   11113: {
     label: "Micro SMG",
@@ -31,6 +33,7 @@ export const ItemDefinitions = {
     useEvent: "fl_inventory:useWeaponMicroSMG",
     removeOnUse: false,
     weaponName: "WEAPON_MICROSMG",
+    maxStack: 2,
   },
   11114: {
     label: "SMG Ammo",
@@ -42,5 +45,6 @@ export const ItemDefinitions = {
     useEvent: "",
     removeOnUse: false,
     ammoType: "smg",
+    maxStack: 10,
   },
 };

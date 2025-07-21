@@ -85,6 +85,38 @@ const App: React.FC = () => {
     if (e?.ctrlKey) {
       const targetInventory = item.inventoryId === 1 ? 2 : 1;
 
+      const stackTargets = items.filter((i) => {
+        return (
+          i.inventoryId === targetInventory &&
+          i.label === item.label &&
+          i.item_id == item.item_id
+        );
+      });
+
+      if (stackTargets.length > 0) {
+        // You could sort stackTargets here by gridY, gridX or any other priority logic
+        const bestStack = stackTargets[0]; // use the first match for now
+
+        fetchNui("moveItem", {
+          label: item.label,
+          fromX: item.gridX,
+          fromY: item.gridY,
+          fromInventory: item.inventoryId,
+          toX: bestStack.gridX,
+          toY: bestStack.gridY,
+          toInventory: targetInventory,
+          width: bestStack.width,
+          height: bestStack.height,
+          originalWidth: item.originalWidth ?? item.width,
+          originalHeight: item.originalHeight ?? item.height,
+          owner: item.owner,
+          secondaryId: secondaryId,
+        });
+
+        setSelectedItem(null);
+        return;
+      }
+
       // Try to find a valid position in the other inventory
       for (let y = 0; y <= GRID_HEIGHT - item.height; y++) {
         for (let x = 0; x <= GRID_WIDTH - item.width; x++) {
