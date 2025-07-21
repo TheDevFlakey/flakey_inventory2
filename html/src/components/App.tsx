@@ -73,6 +73,28 @@ const App: React.FC = () => {
     setSecondaryId(data.secondaryId);
   });
 
+  useNuiEvent("hotbar:useSlot", (data) => {
+    const item = items.find(
+      (i) => i.inventoryId === 69 && i.gridX === data.slot && i.gridY === 0
+    );
+    if (item) {
+      fetchNui("useItem", {
+        label: item.label,
+        gridX: item.gridX,
+        gridY: item.gridY,
+        inventoryId: item.inventoryId,
+        width: item.width,
+        height: item.height,
+        owner: item.owner,
+        id: item.id,
+        useEvent: item.useEvent || "",
+        removeOnUse: item.removeOnUse || false,
+        weaponName: item.weaponName || false,
+        ammoType: item.ammoType || false,
+      });
+    }
+  });
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -448,8 +470,8 @@ const App: React.FC = () => {
                   <>
                     <InventoryWeight
                       items={getDisplayItems(69)}
-                      label="Ground Inventory"
-                      maxInventoryWeight={secondaryMaxWeight} // Adjust this value as needed
+                      label="Hotbar Inventory"
+                      maxInventoryWeight={50} // Adjust this value as needed
                     />
 
                     <div className="h-[600px] bg-white/5 border border-white/10 w-[552px] p-4 flex flex-col justify-between">

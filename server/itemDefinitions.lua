@@ -24,7 +24,7 @@ ItemDefinitions = {
   [11113] = {
     label = "Micro SMG",
     description = "A small submachine gun",
-    weight = 150,
+    weight = 5.5,
     width = 1,
     height = 1,
     image = "./icons/weapon_microsmg.png",
@@ -43,6 +43,17 @@ ItemDefinitions = {
     useEvent = "",
     removeOnUse = false,
     ammoType = "smg",
+    maxStack = 10,
+  },
+    [11115] = {
+    label = "Flower",
+    description = "A fresh flower for Hope Buckley",
+    weight = 0.1,
+    width = 2,
+    height = 2,
+    image = "./icons/flowers.png",
+    useEvent = "",
+    removeOnUse = false,
     maxStack = 10,
   },
 }

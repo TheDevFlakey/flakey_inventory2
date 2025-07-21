@@ -39,6 +39,7 @@ AddEventHandler("fl_inventory:requestItems", function(secondaryId)
             item.removeOnUse = definition.removeOnUse or false
             item.weaponName = definition.weaponName or ""
             item.ammoType = definition.ammoType or ""
+            item.description = definition.description or ""
         end
     end
 

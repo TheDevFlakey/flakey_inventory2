@@ -1,82 +1,63 @@
 import { useNuiEvent } from "../../hooks/useNuiEvent";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 
 interface NotiData {
+  id: number;
   label: string;
   item_id: number;
   msg: string;
+  image?: string;
 }
 
+let uniqueId = 0;
+
 const InventoryNotifications: React.FC = () => {
-  const [queue, setQueue] = useState<NotiData[]>([]);
-  const [current, setCurrent] = useState<NotiData | null>(null);
-  const [visible, setVisible] = useState(false);
-  const isProcessingRef = useRef(false);
+  const [visibleNotis, setVisibleNotis] = useState<NotiData[]>([]);
 
   useNuiEvent("showNotification", (data) => {
-    setQueue((prev) => [
-      ...prev,
-      {
-        label: data.label,
-        item_id: data.item_id,
-        msg: data.msg,
-        image: data.image,
-      },
-    ]);
+    const newNoti: NotiData = {
+      id: uniqueId++,
+      label: data.label,
+      item_id: data.item_id,
+      msg: data.msg,
+      image: data.image,
+    };
+
+    setVisibleNotis((prev) => {
+      const next = [...prev, newNoti];
+      return next.slice(-5); // keep only last 5
+    });
+
+    setTimeout(() => {
+      setVisibleNotis((prev) => prev.filter((n) => n.id !== newNoti.id));
+    }, 2300);
   });
 
-  const processQueue = async () => {
-    if (isProcessingRef.current || queue.length === 0 || current) return;
-
-    isProcessingRef.current = true;
-    const next = queue[0];
-
-    setCurrent(next);
-    setVisible(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // visible duration
-    setVisible(false);
-    await new Promise((resolve) => setTimeout(resolve, 300)); // transition duration
-
-    setQueue((prev) => prev.slice(1));
-    setCurrent(null);
-    isProcessingRef.current = false;
-  };
-
-  useEffect(() => {
-    if (!isProcessingRef.current && queue.length > 0 && !current) {
-      processQueue();
-    }
-  }, [queue, current]);
-
-  const itemImage = current ? current.image : "";
-
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
-      {current && (
+    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-row gap-3">
+      {visibleNotis.map((noti) => (
         <div
-          className={`flex items-center bg-black/90 border border-white/10 text-white px-3 py-2 rounded-md shadow-lg transition-all duration-300 ${
-            visible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-          } transform`}
+          key={noti.id}
+          className={`flex items-center bg-black/90 border border-white/10 text-white px-3 py-2 rounded-md shadow-lg transition-all duration-300 opacity-100 scale-100 transform`}
           style={{ minWidth: "180px" }}
         >
           <div className="w-16 h-16 bg-white/5 rounded-sm flex items-center justify-center mr-3 overflow-hidden border border-white/5 p-1">
-            {itemImage && (
+            {noti.image && (
               <img
-                src={itemImage}
-                alt={current.label}
+                src={noti.image}
+                alt={noti.label}
                 className="max-w-full max-h-full object-contain"
               />
             )}
           </div>
           <div className="flex flex-col">
             <p className="text-sm font-semibold text-white leading-tight">
-              {current.label}
+              {noti.label}
             </p>
-            <p className="text-xs text-blue-400">{current.msg}</p>
+            <p className="text-xs text-blue-400">{noti.msg}</p>
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };

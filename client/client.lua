@@ -57,3 +57,15 @@ RegisterNetEvent("fl_inventory:notification", function(label, item_id, image, ms
 end)
 
 RegisterKeyMapping("open:inv", "Open Inventory", "keyboard", "F2")
+
+CreateThread(function()
+	for i=1, 5 do
+		RegisterKeyMapping("+hotbar"..i, "Hotbar slot "..i, "keyboard", i)
+		RegisterCommand("+hotbar"..i, function(source, args, rawCommand)
+            SendReactMessage("hotbar:useSlot", {
+                slot = i - 1
+            })
+		end, false)
+		RegisterCommand("-hotbar"..i, function() end, false)
+	end
+end)
